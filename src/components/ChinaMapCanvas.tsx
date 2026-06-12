@@ -494,10 +494,19 @@ interface ChinaMapCanvasProps {
 }
 
 export function ChinaMapCanvas({ mapData, cities = [], language = "zh", onReady, onCitySelect, selectedCityId }: ChinaMapCanvasProps) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const cameraZ = isMobile ? 9.5 : MAP_ORBIT_CONTROLS.defaultCameraPosition[2];
+  const maxDistance = isMobile ? 12.0 : MAP_ORBIT_CONTROLS.maxDistance;
+  const defaultPosition: [number, number, number] = [
+    MAP_ORBIT_CONTROLS.defaultCameraPosition[0],
+    MAP_ORBIT_CONTROLS.defaultCameraPosition[1],
+    cameraZ
+  ];
+
   return (
     <div className="webgl-map">
       <Canvas
-        camera={{ position: MAP_ORBIT_CONTROLS.defaultCameraPosition, fov: MAP_CAMERA.fov }}
+        camera={{ position: defaultPosition, fov: MAP_CAMERA.fov }}
         gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
         dpr={[1, 1.8]}
         onCreated={({ gl, scene }) => {
@@ -527,7 +536,7 @@ export function ChinaMapCanvas({ mapData, cities = [], language = "zh", onReady,
           enableZoom={MAP_ORBIT_CONTROLS.enableZoom}
           dampingFactor={MAP_ORBIT_CONTROLS.dampingFactor}
           maxAzimuthAngle={MAP_ORBIT_CONTROLS.maxAzimuthAngle}
-          maxDistance={MAP_ORBIT_CONTROLS.maxDistance}
+          maxDistance={maxDistance}
           maxPolarAngle={MAP_ORBIT_CONTROLS.maxPolarAngle}
           minAzimuthAngle={MAP_ORBIT_CONTROLS.minAzimuthAngle}
           minDistance={MAP_ORBIT_CONTROLS.minDistance}
