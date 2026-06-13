@@ -142,26 +142,26 @@ function ChinaMesh({ mapData }: ChinaMeshProps) {
   }, [mainBoundarySegments, boundaryStyle.gradientColorTop, boundaryStyle.gradientColorBottom]);
 
   const boundaryGeometries = useMemo(
-    () => mainBoundarySegments.map((line) => createLineGeometry(line, boundaryStyle.lineZ, gradientInfo)),
-    [boundaryStyle.lineZ, mainBoundarySegments, gradientInfo]
+    () => mainBoundarySegments.map((line) => createLineGeometry(line, boundaryStyle.lineZ)),
+    [boundaryStyle.lineZ, mainBoundarySegments]
   );
   const glowBoundaryGeometries = useMemo(
-    () => mainBoundarySegments.map((line) => createLineGeometry(line, boundaryStyle.glowZ, gradientInfo)),
-    [boundaryStyle.glowZ, mainBoundarySegments, gradientInfo]
+    () => mainBoundarySegments.map((line) => createLineGeometry(line, boundaryStyle.glowZ)),
+    [boundaryStyle.glowZ, mainBoundarySegments]
   );
   const contourGeometries = useMemo(
     () =>
       mainBoundarySegments
         .filter((line, index) => line.length > 42 && index % 3 === 0)
-        .map((line) => createLineGeometry(line, boundaryStyle.contourZ, gradientInfo)),
-    [boundaryStyle.contourZ, mainBoundarySegments, gradientInfo]
+        .map((line) => createLineGeometry(line, boundaryStyle.contourZ)),
+    [boundaryStyle.contourZ, mainBoundarySegments]
   );
   const outerGlowGeometries = useMemo(
     () =>
       mainBoundarySegments
         .filter((line) => line.length > 48)
-        .map((line) => createLineGeometry(line, boundaryStyle.lineZ + 0.002, gradientInfo)),
-    [boundaryStyle.lineZ, mainBoundarySegments, gradientInfo]
+        .map((line) => createLineGeometry(line, boundaryStyle.lineZ + 0.002)),
+    [boundaryStyle.lineZ, mainBoundarySegments]
   );
   const strataBoundaryGeometries = useMemo(
     () =>
@@ -175,54 +175,50 @@ function ChinaMesh({ mapData }: ChinaMeshProps) {
   const boundaryMaterial = useMemo(
     () =>
       new THREE.LineBasicMaterial({
-        color: "#ffffff",
-        vertexColors: true,
+        color: boundaryStyle.lineColor,
         transparent: true,
         opacity: boundaryStyle.lineOpacity,
         blending: THREE.AdditiveBlending,
         depthTest: false,
         depthWrite: false
       }),
-    [boundaryStyle.lineOpacity]
+    [boundaryStyle.lineOpacity, boundaryStyle.lineColor]
   );
   const glowBoundaryMaterial = useMemo(
     () =>
       new THREE.LineBasicMaterial({
-        color: "#ffffff",
-        vertexColors: true,
+        color: boundaryStyle.glowColor,
         transparent: true,
         opacity: boundaryStyle.glowOpacity,
         blending: THREE.AdditiveBlending,
         depthTest: false,
         depthWrite: false
       }),
-    [boundaryStyle.glowOpacity]
+    [boundaryStyle.glowOpacity, boundaryStyle.glowColor]
   );
   const contourMaterial = useMemo(
     () =>
       new THREE.LineBasicMaterial({
-        color: "#ffffff",
-        vertexColors: true,
+        color: boundaryStyle.contourColor,
         transparent: true,
         opacity: boundaryStyle.contourOpacity,
         blending: THREE.AdditiveBlending,
         depthTest: false,
         depthWrite: false
       }),
-    [boundaryStyle.contourOpacity]
+    [boundaryStyle.contourOpacity, boundaryStyle.contourColor]
   );
   const outerGlowMaterial = useMemo(
     () =>
       new THREE.LineBasicMaterial({
-        color: "#ffffff",
-        vertexColors: true,
+        color: boundaryStyle.glowColor,
         transparent: true,
         opacity: 0.18,
         blending: THREE.AdditiveBlending,
         depthTest: false,
         depthWrite: false
       }),
-    []
+    [boundaryStyle.glowColor]
   );
   const strataMaterial = useMemo(
     () =>
