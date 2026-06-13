@@ -41,8 +41,13 @@ export async function prepareImageFile(file: File, maxSize = 1600): Promise<Prep
     canvas.height = height;
     context.drawImage(image, 0, 0, width, height);
 
+    let dataUrl = canvas.toDataURL("image/webp", 0.86);
+    if (!dataUrl.startsWith("data:image/webp")) {
+      dataUrl = canvas.toDataURL("image/jpeg", 0.86);
+    }
+
     return {
-      url: canvas.toDataURL("image/webp", 0.86),
+      url: dataUrl,
       width,
       height
     };

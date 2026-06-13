@@ -5,13 +5,34 @@ import { createDemoStory, type Photo, type Story } from "../domain/story";
 
 const idbStorage = {
   getItem: async (name: string): Promise<string | null> => {
-    return (await get(name)) || null;
+    try {
+      return (await get(name)) || window.localStorage.getItem(name) || null;
+    } catch (err) {
+      console.warn("IDB get failed, falling back to localStorage", err);
+      return window.localStorage.getItem(name) || null;
+    }
   },
   setItem: async (name: string, value: string): Promise<void> => {
-    await set(name, value);
+    try {
+      await set(name, value);
+      // Also write to localStorage if small enough, for extra safety
+      try { window.localStorage.setItem(name, value); } catch (e) {}
+    } catch (err) {
+      console.warn("IDB set failed, falling back to localStorage", err);
+      try {
+        window.localStorage.setItem(name, value);
+      } catch (lsErr) {
+        console.error("localStorage also failed", lsErr);
+      }
+    }
   },
   removeItem: async (name: string): Promise<void> => {
-    await del(name);
+    try {
+      await del(name);
+    } catch (err) {
+      console.warn("IDB remove failed", err);
+    }
+    window.localStorage.removeItem(name);
   },
 };
 
