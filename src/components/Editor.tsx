@@ -202,10 +202,20 @@ export function Editor({
               onChange={(event) => updatePhoto(photo.id, { cityId: event.target.value })}
             >
               <option value="">{copy.selectCity}</option>
-              {cities.map((city) => (
-                <option key={city.id} value={city.id}>
-                  {cityOptionLabel(city, language)}
-                </option>
+              {Object.entries(
+                cities.reduce((acc, city) => {
+                  if (!acc[city.province]) acc[city.province] = [];
+                  acc[city.province].push(city);
+                  return acc;
+                }, {} as Record<string, typeof cities>)
+              ).map(([province, provinceCities]) => (
+                <optgroup key={province} label={province}>
+                  {provinceCities.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {cityOptionLabel(city, language)}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
             <ChevronDown className="select-chevron" aria-hidden="true" size={15} />
@@ -371,10 +381,20 @@ export function Editor({
                 onChange={(e) => setBatchSelectedCityId(e.target.value)}
               >
                 <option value="">{copy.selectCity}</option>
-                {cities.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {cityOptionLabel(city, language)}
-                  </option>
+                {Object.entries(
+                  cities.reduce((acc, city) => {
+                    if (!acc[city.province]) acc[city.province] = [];
+                    acc[city.province].push(city);
+                    return acc;
+                  }, {} as Record<string, typeof cities>)
+                ).map(([province, provinceCities]) => (
+                  <optgroup key={province} label={province}>
+                    {provinceCities.map((city) => (
+                      <option key={city.id} value={city.id}>
+                        {cityOptionLabel(city, language)}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
               <ChevronDown className="select-chevron" aria-hidden="true" size={15} />
