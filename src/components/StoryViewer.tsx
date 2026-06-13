@@ -104,14 +104,14 @@ export function StoryViewer({
     try {
       if (!document.fullscreenElement) {
         await document.documentElement.requestFullscreen();
-        if (window.screen?.orientation?.lock) {
-          await window.screen.orientation.lock("landscape").catch(e => console.warn(e));
+        if ((window.screen?.orientation as any)?.lock) {
+          await (window.screen.orientation as any).lock("landscape").catch((e: any) => console.warn(e));
         }
       } else {
-        if (window.screen?.orientation?.unlock) {
-          window.screen.orientation.unlock();
+        if ((window.screen?.orientation as any)?.unlock) {
+          (window.screen.orientation as any).unlock();
         }
-        await document.exitFullscreen().catch(e => console.warn(e));
+        await document.exitFullscreen().catch((e: any) => console.warn(e));
       }
     } catch (err) {
       console.warn("Fullscreen/Orientation lock failed", err);
@@ -397,10 +397,10 @@ export function StoryViewer({
               className="ghost-button"
               type="button"
               onClick={toggleLandscape}
-              title={isFullscreen ? (activeLanguage === "zh" ? "退出全屏" : "Exit fullscreen") : (activeLanguage === "zh" ? "横屏模式" : "Landscape mode")}
+              title={isFullscreen ? (activeLanguage === "zh" ? "退出" : "Exit") : (activeLanguage === "zh" ? "横屏" : "Full")}
             >
               <Smartphone aria-hidden="true" size={18} />
-              {isFullscreen ? (activeLanguage === "zh" ? "退出全屏" : "Exit fullscreen") : (activeLanguage === "zh" ? "横屏模式" : "Landscape mode")}
+              {isFullscreen ? (activeLanguage === "zh" ? "退出" : "Exit") : (activeLanguage === "zh" ? "横屏" : "Full")}
             </button>
           )}
           {!selectedCity ? (
