@@ -494,9 +494,9 @@ interface ChinaMapCanvasProps {
 }
 
 export function ChinaMapCanvas({ mapData, cities = [], language = "zh", onReady, onCitySelect, selectedCityId }: ChinaMapCanvasProps) {
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const cameraZ = isMobile ? 9.5 : MAP_ORBIT_CONTROLS.defaultCameraPosition[2];
-  const maxDistance = isMobile ? 12.0 : MAP_ORBIT_CONTROLS.maxDistance;
+  const isMobilePortrait = typeof window !== "undefined" && window.innerWidth < 768 && window.innerHeight > window.innerWidth;
+  const cameraZ = isMobilePortrait ? 14.5 : MAP_ORBIT_CONTROLS.defaultCameraPosition[2];
+  const maxDistance = isMobilePortrait ? 22.0 : MAP_ORBIT_CONTROLS.maxDistance;
   const defaultPosition: [number, number, number] = [
     MAP_ORBIT_CONTROLS.defaultCameraPosition[0],
     MAP_ORBIT_CONTROLS.defaultCameraPosition[1],
