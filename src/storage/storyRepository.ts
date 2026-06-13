@@ -1,3 +1,4 @@
+import { get, set } from "idb-keyval";
 import type { Story } from "../domain/story";
 
 const storyKey = (id: string) => `china-memory-story:${id}`;
@@ -16,19 +17,19 @@ export class LocalStoryRepository implements StoryRepository {
       publishedAt: new Date().toISOString()
     };
 
-    window.localStorage.setItem(storyKey(published.id), JSON.stringify(published));
-    window.localStorage.setItem(latestKey, published.id);
+    await set(storyKey(published.id), JSON.stringify(published));
+    await set(latestKey, published.id);
     return published;
   }
 
   async findById(id: string): Promise<Story | undefined> {
-    const rawStory = window.localStorage.getItem(storyKey(id));
+    const rawStory = await get(storyKey(id));
     return rawStory ? (JSON.parse(rawStory) as Story) : undefined;
   }
 
   async findLatest(): Promise<Story | undefined> {
-    const latestId = window.localStorage.getItem(latestKey);
-    return latestId ? this.findById(latestId) : undefined;
+    const latestId = await get(latestKey);
+    return latestId ? this.findById(latestId as string) : undefined;
   }
 }
 
