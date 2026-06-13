@@ -484,20 +484,6 @@ export function StoryViewer({
         }) : null}
       </div>
 
-      <aside className="city-rail" aria-label={copy.viewer.citiesWithPhotos}>
-        {cities.map((city) => (
-          <button
-            key={city.id}
-            className={city.id === selectedCity?.id ? "city-pill city-pill--active" : "city-pill"}
-            type="button"
-            onClick={() => setSelectedCity(city)}
-          >
-            <MapPin aria-hidden="true" size={14} />
-            {cityDisplayName(city, activeLanguage)}
-          </button>
-        ))}
-      </aside>
-
       {selectedCity && currentPhoto ? (
         <div ref={theaterRef} className="photo-theater" style={focusStyle} role="dialog" aria-label={cityDialogLabel(selectedCity, activeLanguage)}>
           <button className="close-theater" type="button" aria-label={copy.viewer.backToMap} onClick={() => setSelectedCity(undefined)}>
