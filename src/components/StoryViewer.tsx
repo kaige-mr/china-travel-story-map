@@ -11,7 +11,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent
 } from "react";
-import { ChevronLeft, ChevronRight, MapPin, RotateCcw, X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, RotateCcw, X, PanelLeftClose, PanelLeftOpen, Smartphone } from "lucide-react";
 import { isWebGLAvailable } from "../utils/webgl";
 import type { Language } from "../i18n";
 import { cityDialogLabel, cityDisplayName, cityPhotoAriaLabel, translations } from "../i18n";
@@ -83,6 +83,7 @@ export function StoryViewer({
   const [mapAspect, setMapAspect] = useState(1.25);
   const dragStartXRef = useRef<number | undefined>(undefined);
   const [isMobile, setIsMobile] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useLayoutEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -90,6 +91,33 @@ export function StoryViewer({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
+
+  const toggleLandscape = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+        if (window.screen?.orientation?.lock) {
+          await window.screen.orientation.lock("landscape").catch(e => console.warn(e));
+        }
+      } else {
+        if (window.screen?.orientation?.unlock) {
+          window.screen.orientation.unlock();
+        }
+        await document.exitFullscreen().catch(e => console.warn(e));
+      }
+    } catch (err) {
+      console.warn("Fullscreen/Orientation lock failed", err);
+      alert(activeLanguage === "zh" ? "请开启手机自动旋转，并横向拿取手机" : "Please enable auto-rotate and hold your phone horizontally.");
+    }
+  };
 
   const activeLanguage = language ?? localLanguage;
   const setActiveLanguage = onLanguageChange ?? setLocalLanguage;
@@ -364,6 +392,17 @@ export function StoryViewer({
         </div>
         <div className="stage-header__actions">
           <LanguageToggle language={activeLanguage} onLanguageChange={setActiveLanguage} />
+          {isMobile && (
+            <button
+              className="ghost-button"
+              type="button"
+              onClick={toggleLandscape}
+              title={isFullscreen ? (activeLanguage === "zh" ? "退出全屏" : "Exit fullscreen") : (activeLanguage === "zh" ? "横屏模式" : "Landscape mode")}
+            >
+              <Smartphone aria-hidden="true" size={18} />
+              {isFullscreen ? (activeLanguage === "zh" ? "退出全屏" : "Exit fullscreen") : (activeLanguage === "zh" ? "横屏模式" : "Landscape mode")}
+            </button>
+          )}
           {!selectedCity ? (
             <button className="ghost-button" type="button" onClick={() => setSelectedCity(undefined)}>
               <RotateCcw aria-hidden="true" size={18} />
