@@ -17,6 +17,75 @@ interface EditorProps {
   language?: Language;
 }
 
+function CascadingCitySelect({
+  cityId,
+  onChange,
+  language,
+  selectCityCopy,
+  id
+}: {
+  cityId: string | undefined;
+  onChange: (cityId: string) => void;
+  language: Language;
+  selectCityCopy: string;
+  id?: string;
+}) {
+  const initialCity = cities.find(c => c.id === cityId);
+  const [province, setProvince] = useState(initialCity ? initialCity.province : "");
+
+  useEffect(() => {
+    const c = cities.find(c => c.id === cityId);
+    if (c) {
+      setProvince(c.province);
+    } else if (!cityId) {
+      setProvince("");
+    }
+  }, [cityId]);
+
+  const provinces = useMemo(() => [...new Set(cities.map(c => c.province))], []);
+  const provinceCities = useMemo(() => cities.filter(c => c.province === province), [province]);
+
+  return (
+    <div className="cascading-select-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
+      <div className="select-container">
+        <select
+          id={id ? `${id}-province` : undefined}
+          className="text-input select-input"
+          value={province}
+          onChange={(e) => {
+            setProvince(e.target.value);
+            onChange("");
+          }}
+        >
+          <option value="">{language === "en" ? "Select Province" : "选择省份"}</option>
+          {provinces.map(p => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+        <ChevronDown className="select-chevron" aria-hidden="true" size={15} />
+      </div>
+      {province && (
+        <div className="select-container">
+          <select
+            id={id}
+            className="text-input select-input"
+            value={cityId || ""}
+            onChange={(e) => onChange(e.target.value)}
+          >
+            <option value="">{selectCityCopy}</option>
+            {provinceCities.map((city) => (
+              <option key={city.id} value={city.id}>
+                {cityOptionLabel(city, language)}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="select-chevron" aria-hidden="true" size={15} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Editor({
   story,
   onStoryChange,
@@ -194,32 +263,13 @@ export function Editor({
           <label className="field-label" htmlFor={`city-${photo.id}`}>
             {copy.cityFor} {photo.caption}
           </label>
-          <div className="select-container">
-            <select
-              id={`city-${photo.id}`}
-              className="text-input select-input"
-              value={photo.cityId}
-              onChange={(event) => updatePhoto(photo.id, { cityId: event.target.value })}
-            >
-              <option value="">{copy.selectCity}</option>
-              {Object.entries(
-                cities.reduce((acc, city) => {
-                  if (!acc[city.province]) acc[city.province] = [];
-                  acc[city.province].push(city);
-                  return acc;
-                }, {} as Record<string, typeof cities>)
-              ).map(([province, provinceCities]) => (
-                <optgroup key={province} label={province}>
-                  {provinceCities.map((city) => (
-                    <option key={city.id} value={city.id}>
-                      {cityOptionLabel(city, language)}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-            <ChevronDown className="select-chevron" aria-hidden="true" size={15} />
-          </div>
+          <CascadingCitySelect
+            id={`city-${photo.id}`}
+            cityId={photo.cityId}
+            onChange={(cityId) => updatePhoto(photo.id, { cityId })}
+            language={language}
+            selectCityCopy={copy.selectCity}
+          />
         </div>
       </div>
     </article>
@@ -374,31 +424,12 @@ export function Editor({
           <div className="batch-modal">
             <h3>{copy.batchImportTitle}</h3>
             <p>{copy.batchImportMessage.replace("{count}", String(pendingBatchPhotos.length))}</p>
-            <div className="select-container">
-              <select
-                className="text-input select-input"
-                value={batchSelectedCityId}
-                onChange={(e) => setBatchSelectedCityId(e.target.value)}
-              >
-                <option value="">{copy.selectCity}</option>
-                {Object.entries(
-                  cities.reduce((acc, city) => {
-                    if (!acc[city.province]) acc[city.province] = [];
-                    acc[city.province].push(city);
-                    return acc;
-                  }, {} as Record<string, typeof cities>)
-                ).map(([province, provinceCities]) => (
-                  <optgroup key={province} label={province}>
-                    {provinceCities.map((city) => (
-                      <option key={city.id} value={city.id}>
-                        {cityOptionLabel(city, language)}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-              <ChevronDown className="select-chevron" aria-hidden="true" size={15} />
-            </div>
+            <CascadingCitySelect
+              cityId={batchSelectedCityId}
+              onChange={setBatchSelectedCityId}
+              language={language}
+              selectCityCopy={copy.selectCity}
+            />
             <div className="batch-modal-actions">
               <button className="secondary-action" type="button" onClick={skipBatchImport}>
                 {copy.batchImportSkip}
