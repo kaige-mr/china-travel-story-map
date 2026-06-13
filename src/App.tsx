@@ -62,7 +62,7 @@ export function App() {
   const setStory = useStoryStore((state) => state.setStory);
   const resetToDemo = useStoryStore((state) => state.resetToDemo);
   const [publishedUrl, setPublishedUrl] = useState("");
-  const [editorCollapsed, setEditorCollapsed] = useState(false);
+  const [editorCollapsed, setEditorCollapsed] = useState(true);
   const copy = translations[language].app;
 
   useEffect(() => {

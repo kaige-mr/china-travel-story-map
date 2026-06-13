@@ -1074,7 +1074,7 @@ button {
   }
 }
 
-@media (max-width: 980px) {
+@media (max-width: 980px) and (orientation: portrait) {
   .app-shell {
     display: block;
     height: 100vh;
@@ -1123,7 +1123,7 @@ button {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 640px) and (orientation: portrait) {
   .editor-panel {
     padding: 16px 12px;
   }
@@ -1192,4 +1192,15 @@ button {
     display: none;
   }
 }
+
+@media (max-width: 980px) and (orientation: landscape) {
+  .app-shell {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  .editor-panel {
+    padding: 16px 12px;
+  }
+}
+
 .batch-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); } .batch-modal { background: #1a2327; border: 1px solid #32e6ff; border-radius: 12px; padding: 24px; width: 90%; max-width: 400px; box-shadow: 0 8px 32px rgba(0, 229, 255, 0.15); display: flex; flex-direction: column; gap: 16px; } .batch-modal h3 { margin: 0; color: #fff; font-size: 1.2rem; } .batch-modal p { margin: 0; color: #a0b4bc; font-size: 0.95rem; line-height: 1.5; } .batch-modal-actions { display: flex; gap: 12px; margin-top: 8px; } .batch-modal-actions button { flex: 1; }
