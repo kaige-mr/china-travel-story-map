@@ -11,7 +11,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent
 } from "react";
-import { ChevronLeft, ChevronRight, MapPin, RotateCcw, X, PanelLeftClose, PanelLeftOpen, Smartphone } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, X, PanelLeftClose, PanelLeftOpen, Smartphone } from "lucide-react";
 import { isWebGLAvailable } from "../utils/webgl";
 import type { Language } from "../i18n";
 import { cityDialogLabel, cityDisplayName, cityPhotoAriaLabel, translations } from "../i18n";
@@ -403,12 +403,7 @@ export function StoryViewer({
               {isFullscreen ? (activeLanguage === "zh" ? "退出" : "Exit") : (activeLanguage === "zh" ? "横屏" : "Full")}
             </button>
           )}
-          {!selectedCity ? (
-            <button className="ghost-button" type="button" onClick={() => setSelectedCity(undefined)}>
-              <RotateCcw aria-hidden="true" size={18} />
-              {copy.viewer.resetView}
-            </button>
-          ) : null}
+
           {onToggleEditor && (
             <button
               className="ghost-button"
