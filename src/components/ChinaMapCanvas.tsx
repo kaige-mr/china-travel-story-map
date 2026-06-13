@@ -231,6 +231,7 @@ function ChinaMesh({ mapData }: ChinaMeshProps) {
         transparent: true,
         opacity: 0.3,
         blending: THREE.AdditiveBlending,
+        depthTest: false,
         depthWrite: false
       }),
     []
