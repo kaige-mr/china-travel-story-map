@@ -7,6 +7,8 @@ import { focusStoryCity } from "../events/storyViewerEvents";
 import type { Language } from "../i18n";
 import { cityDisplayName, cityOptionLabel, translations, validationReason } from "../i18n";
 import { fileNameToCaption, prepareImageFile } from "../utils/image";
+import { matchCity } from "../utils/pinyinSearch";
+import { generateShareCardCanvas } from "../utils/cardGenerator";
 
 interface EditorProps {
   story: Story;
@@ -37,16 +39,27 @@ function CascadingCitySelect({
     const c = cities.find(c => c.id === cityId);
     if (c) {
       setProvince(c.province);
-    } else if (!cityId) {
-      setProvince("");
     }
   }, [cityId]);
 
+  const [searchQuery, setSearchQuery] = useState("");
   const provinces = useMemo(() => [...new Set(cities.map(c => c.province))], []);
   const provinceCities = useMemo(() => cities.filter(c => c.province === province), [province]);
+  const filteredCities = useMemo(() => {
+    if (!searchQuery.trim()) return provinceCities;
+    return provinceCities.filter(c => matchCity({ code: c.id, name: c.name, pinyinPrefix: c.name.slice(0, 1), province: c.province }, searchQuery));
+  }, [provinceCities, searchQuery]);
 
   return (
     <div className="cascading-select-group" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
+      <input
+        type="text"
+        className="text-input"
+        style={{ fontSize: '13px', padding: '6px 8px' }}
+        placeholder={language === "en" ? "Filter by pinyin or city..." : "拼音或城市名搜索过滤..."}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
       <div className="select-container">
         <select
           id={id ? `${id}-province` : undefined}
@@ -73,7 +86,7 @@ function CascadingCitySelect({
             onChange={(e) => onChange(e.target.value)}
           >
             <option value="">{selectCityCopy}</option>
-            {provinceCities.map((city) => (
+            {filteredCities.map((city) => (
               <option key={city.id} value={city.id}>
                 {cityOptionLabel(city, language)}
               </option>
@@ -312,6 +325,24 @@ export function Editor({
       <div className="editor-stats" aria-label="Story summary">
         <span>{story.photos.length} {copy.photos}</span>
         <span>{photosByCity} {copy.cities}</span>
+        <button
+          type="button"
+          className="button button--secondary"
+          style={{ marginLeft: "auto", fontSize: "12px", padding: "4px 8px" }}
+          onClick={() => {
+            const canvas = generateShareCardCanvas({
+              storyTitle: story.title || "中国旅行足迹故事",
+              totalDistanceKm: 1280,
+              cityCount: story.nodes.length
+            });
+            const link = document.createElement("a");
+            link.download = "share-card.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+          }}
+        >
+          {language === "en" ? "Export Card" : "生成分享卡片"}
+        </button>
       </div>
 
       <div className="photo-editor-list">

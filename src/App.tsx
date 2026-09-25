@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Copy, Eye, FileImage, PanelLeftClose, PanelLeftOpen, RotateCcw } from "lucide-react";
 import { Editor } from "./components/Editor";
 import { StoryViewer } from "./components/StoryViewer";
+import { TimelinePlayer } from "./components/TimelinePlayer";
+import { PhotoLightbox } from "./components/PhotoLightbox";
+import { calculateStoryStats } from "./domain/statsCalculator";
 import { createDemoStory, type Story } from "./domain/story";
 import type { Language } from "./i18n";
 import { translations } from "./i18n";
@@ -63,7 +66,16 @@ export function App() {
   const resetToDemo = useStoryStore((state) => state.resetToDemo);
   const [publishedUrl, setPublishedUrl] = useState("");
   const [editorCollapsed, setEditorCollapsed] = useState(true);
+  const [currentNodeIndex, setCurrentNodeIndex] = useState(0);
+  const [isPlayingTimeline, setIsPlayingTimeline] = useState(false);
+  const [activePhotoUrl, setActivePhotoUrl] = useState<string | null>(null);
+
   const copy = translations[language].app;
+
+  // Travel statistics calculation
+  const travelStats = useMemo(() => {
+    return calculateStoryStats(story);
+  }, [story]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -126,6 +138,27 @@ export function App() {
             onToggleEditor={() => setEditorCollapsed(!editorCollapsed)}
           />
         </div>
+
+        {/* Floating Timeline Player & Travel Stats Bar */}
+        <div className="timeline-dock" style={{ position: "absolute", bottom: 16, right: 16, zIndex: 100, display: "flex", flexDirection: "column", gap: 8, background: "rgba(255,255,255,0.9)", padding: 8, borderRadius: 8, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
+          <div style={{ fontSize: 12, color: "#555" }}>
+            足迹统计: {travelStats.provinceCount} 省 / {travelStats.cityCount} 市 ({travelStats.totalDistanceKm} km)
+          </div>
+          <TimelinePlayer
+            totalNodes={story.nodes.length}
+            currentNodeIndex={currentNodeIndex}
+            onIndexChange={setCurrentNodeIndex}
+            isPlaying={isPlayingTimeline}
+            onPlayToggle={() => setIsPlayingTimeline(!isPlayingTimeline)}
+          />
+        </div>
+
+        {/* Fullscreen Photo Lightbox Modal */}
+        <PhotoLightbox
+          isOpen={!!activePhotoUrl}
+          photoUrl={activePhotoUrl ?? ""}
+          onClose={() => setActivePhotoUrl(null)}
+        />
       </main>
     </div>
   );
